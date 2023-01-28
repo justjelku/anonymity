@@ -1,4 +1,21 @@
-# finalproject
+# finalprojectgroup4
+
+ANONYMITY APP
+
+GROUP 4
+
+GROUP MEMBERS:
+
+Arjay Audiencia Charcos,
+Jeremiah Larry King Ungsod,
+Angelica Lazarito,
+Janmark Sabanal, 
+Johnlearn Mosqueda, 
+Jonard Salvanera Estamo,
+Julianne G Ong,
+Ronald Naguita,
+
+
 
 A new Flutter project.
 
