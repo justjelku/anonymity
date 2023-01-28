@@ -40,7 +40,7 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
 
-  late TextEditingController userNameController = TextEditingController();
+  final TextEditingController userNameController = TextEditingController();
   final TextEditingController firstNameController = TextEditingController();
   final TextEditingController lastNameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
@@ -52,7 +52,7 @@ class _LoginPageState extends State<LoginPage> {
   List<DataModel> data = [];
   late int currentIndex;
   late DB db;
-
+  String? displayUser;
 
 
   @override
@@ -61,6 +61,7 @@ class _LoginPageState extends State<LoginPage> {
     db.initDB();
     checkPermission();
     getUsers();
+
     super.initState();
   }
 
@@ -84,6 +85,35 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
+  Future loginData() async {
+    var username = userNameController.text;
+    var password = passwordController.text;
+
+    for (var i = 0; i <= accounts.length; i++) {
+      if (username == accounts[i]['username'] &&
+          password == accounts[i]['password']) {
+        _showMsg('Login Success');
+        account.add(accounts[i]);
+        await Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => HomePage(data: account))
+        );
+        break;
+      }
+    }
+
+  }
+  _showMsg(msg) {
+    final snackBar = SnackBar(
+        content: Text(msg),
+        action: SnackBarAction(
+          label: 'Close',
+          onPressed: () {},
+        )
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
 
   @override
   void dispose() {
@@ -92,6 +122,7 @@ class _LoginPageState extends State<LoginPage> {
     passwordController.dispose();
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -100,23 +131,25 @@ class _LoginPageState extends State<LoginPage> {
             child: ListView(
                 padding: const EdgeInsets.all(30),
                 children: [
-                ChangeColors(
-                    hue: 0.55,
-                    brightness: 0.2,
-                    saturation: 0.1,
-                  child: Image.asset("assets/logo.png",
-                      width: 300,
-                      height: 300)
+                  ChangeColors(
+                      hue: 0.55,
+                      brightness: 0.2,
+                      saturation: 0.1,
+                      child: Image.asset("assets/logo.png",
+                          width: 300,
+                          height: 300)
                   ),
                   const Text("ANONYMITY", style: TextStyle(fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
-                  const SizedBox(height: 50),
+                  const SizedBox(height: 25),
+                  Text("Welcome $displayUser !", style: const TextStyle(fontSize: 15, color: Colors.white, fontStyle: FontStyle.italic), textAlign: TextAlign.center),
+                  const SizedBox(height: 20),
                   TextFormField(
                     controller: userNameController,
                     keyboardType: TextInputType.name,
                     decoration: InputDecoration(
-                        labelText: "Username",
-                        contentPadding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0)),
+                      labelText: "Username",
+                      contentPadding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0)),
                     ),
                     validator: (value){
                       return (value == '')? "Input Name" : null;
@@ -137,10 +170,10 @@ class _LoginPageState extends State<LoginPage> {
                   const SizedBox(height: 10),
                   ElevatedButton(
                       onPressed: () {
-
+                        loginData();
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.greenAccent
+                          backgroundColor: Colors.greenAccent
                       ),
                       child: const Text("Sign In", style: TextStyle(color: Colors.black, fontSize: 17))
                   ),
@@ -226,25 +259,34 @@ class _LoginPageState extends State<LoginPage> {
             actions: [
               TextButton(
                 onPressed: () {
-                   if (formKey.currentState!.validate()) {
-                     Navigator.pop(context);
-                     currentIndex = accounts.lastIndexOf('id', 0);
-                     setState(() {
-                       postAccount(
-                           currentIndex,
-                           firstNameController.text,
-                           lastNameController.text,
-                           userNameController.text,
-                           passwordController.text,
-                           emailController.text
-                       );
-                     });
-                     firstNameController.clear();
-                     lastNameController.clear();
-                     userNameController.clear();
-                     passwordController.clear();
-                     emailController.clear();
-                   }
+                  if (formKey.currentState!.validate()) {
+                    Navigator.pop(context);
+                    currentIndex = accounts.indexOf('id', 0);
+                    DataModel dataLocal = DataModel(
+                      firstname: firstNameController.text,
+                      lastname: lastNameController.text,
+                      username: userNameController.text,
+                      password: passwordController.text,
+                      email: emailController.text,
+                    );
+                    db.insertData(dataLocal);
+                    print(db);
+                    setState(() {
+                      postAccount(
+                          currentIndex,
+                          firstNameController.text,
+                          lastNameController.text,
+                          userNameController.text,
+                          passwordController.text,
+                          emailController.text
+                      );
+                    });
+                    firstNameController.clear();
+                    lastNameController.clear();
+                    userNameController.clear();
+                    passwordController.clear();
+                    emailController.clear();
+                  }
                 },
                 child: const Center(
                   child: Text("Sign Up"),
@@ -252,6 +294,7 @@ class _LoginPageState extends State<LoginPage> {
               ),
             ],
           );
-        });
+        }
+    );
   }
 }
