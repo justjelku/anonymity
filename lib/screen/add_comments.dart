@@ -114,12 +114,11 @@ class _CommentsState extends State<Comments> {
     setState( () {
       comments = convert.jsonDecode(response.body) as List<dynamic>;
       for(int i = 0; i <= comments.length; i++){
-        if(data == comments[i]['postId']){
+        if(data == comments[comments.length]['postId']){
           postComments.add(comments[i]);
         }
       }
-    }
-    );
+    });
   }
 
 
