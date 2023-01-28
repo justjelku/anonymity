@@ -79,7 +79,9 @@ class _NavBarState extends State<NavBar> {
                 color: Colors.greenAccent,
                 image: DecorationImage(
                     fit: BoxFit.fill,
-                    image: NetworkImage('https://static.vecteezy.com/system/resources/thumbnails/000/582/800/small_2x/RR-v-mar-2019-52.jpg')
+                    image: NetworkImage(
+                        'https://static.vecteezy.com/system/resources/thumbnails/000/582/800/small_2x/RR-v-mar-2019-52.jpg'
+                    )
                 ),
               )
           ),
@@ -89,7 +91,11 @@ class _NavBarState extends State<NavBar> {
             onTap: () {
               Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => HomePage(data: widget.data))
+                  MaterialPageRoute(
+                      builder: (context) => HomePage(
+                          data: widget.data
+                      )
+                  )
               );
             },
           ),
@@ -99,28 +105,39 @@ class _NavBarState extends State<NavBar> {
             onTap: () {
               Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const ImageShare())
+                  MaterialPageRoute(
+                      builder: (context) => const ImageShare())
               );
             },
           ),
           ListTile(
-            leading: const Icon(Icons.settings),
+            leading: const Icon(
+                Icons.settings
+            ),
             title: const Text('Settings'),
             onTap: () {
               userId = int.parse(widget.data[0]['id']);
               Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => Settings(data: userId))
+                  MaterialPageRoute(
+                      builder: (context) => Settings(
+                          data: userId
+                      )
+                  )
               );
             },
           ),
           ListTile(
-            leading: const Icon(Icons.email),
+            leading: const Icon(
+                Icons.email
+            ),
             title: const Text('Contact Us'),
             onTap: () {
               Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const ContactUs())
+                  MaterialPageRoute(
+                      builder: (context) => const ContactUs()
+                  )
               );
             },
           ),
@@ -131,7 +148,9 @@ class _NavBarState extends State<NavBar> {
             onTap: () {
               Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const LoginPage())
+                  MaterialPageRoute(
+                      builder: (context) => const LoginPage()
+                  )
               );
             },
           ),
@@ -141,7 +160,9 @@ class _NavBarState extends State<NavBar> {
   }
   getCam(ImageSource source) async {
     // ignore: deprecated_member_use
-    var img = await image.getImage(source: ImageSource.camera);
+    var img = await image.getImage(
+        source: ImageSource.camera
+    );
     setState(() {
       file = File(img!.path);
     });
@@ -149,7 +170,9 @@ class _NavBarState extends State<NavBar> {
 
   getGall(ImageSource source) async {
     // ignore: deprecated_member_use
-    var img = await image.getImage(source: ImageSource.gallery);
+    var img = await image.getImage(
+        source: ImageSource.gallery
+    );
     setState(() {
       file = File(img!.path);
     });

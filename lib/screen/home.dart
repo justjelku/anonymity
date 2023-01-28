@@ -160,7 +160,10 @@ class _HomePageState extends State<HomePage> {
                                   postId = int.parse(posts[index]['postId']);
                                   Navigator.push(
                                       context,
-                                      MaterialPageRoute(builder: (context) => Comments(data: int.parse(posts[index]['postId'])))
+                                      MaterialPageRoute(builder: (context) => Comments(
+                                          data: int.parse(
+                                              posts[index]['postId'])
+                                      ))
                                   );
                                 },
                                 icon: const Icon(

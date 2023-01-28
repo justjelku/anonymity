@@ -32,7 +32,11 @@ class _ImageUploadState extends State<ImageUpload> {
   uploadImage(File image) async {
     var request = http.MultipartRequest("POST", Uri.parse("https://63c95a0e320a0c4c9546afb1.mockapi.io/api/images_share"));
     request.fields["image"] = _image.toString();
-    request.files.add(http.MultipartFile.fromBytes("picture", File(_image!.path).readAsBytesSync(),filename: _image!.path));
+    request.files.add(
+        http.MultipartFile.fromBytes(
+            "picture",
+            File(_image!.path).readAsBytesSync(),filename: _image!.path)
+    );
     var res = await request.send();
     throw res;
   }
