@@ -68,6 +68,8 @@ class _ImageUploadState extends State<ImageUpload> {
                   ElevatedButton(
                       onPressed: (){
                         uploadImage(_image!);
+
+                        Navigator.pop(context);
                       },
                       child: const Text("Upload")
                   )
