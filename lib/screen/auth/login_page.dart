@@ -61,7 +61,7 @@ class _LoginPageState extends State<LoginPage> {
     db.initDB();
     checkPermission();
     getUsers();
-
+    getUsername();
     super.initState();
   }
 
@@ -112,6 +112,13 @@ class _LoginPageState extends State<LoginPage> {
         )
     );
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
+  getUsername() async{
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    setState(() {
+      displayUser = pref.getString('displayUser')!;
+    });
   }
 
 
