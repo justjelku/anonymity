@@ -1,10 +1,10 @@
-import 'package:finalproject/csidebar/collapsible_sidebar.dart';
-import 'package:finalproject/screen/create_post.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert' as convert;
+import '../csidebar/collapsible_sidebar.dart';
 import 'add_comments.dart';
+import 'create_post.dart';
 
 class HomePage extends StatefulWidget {
 

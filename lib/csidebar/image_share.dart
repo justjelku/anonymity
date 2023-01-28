@@ -26,10 +26,9 @@ class _ImageShareState extends State<ImageShare> {
     var url = "https://63c95a0e320a0c4c9546afb1.mockapi.io/api/images_share";
     var response = await http.get(Uri.parse(url));
 
-    setState( () {
+    setState(() {
       photos = convert.jsonDecode(response.body) as List<dynamic>;
-    }
-    );
+    });
   }
 
 
@@ -43,14 +42,16 @@ class _ImageShareState extends State<ImageShare> {
           itemCount: photos.length,
           itemBuilder: (context, index){
             return ListTile(
-              title: Text("${photos[index]['image']}"),
+              title: Image.network(
+                "${photos[index]['image']}",
+              ),
             );
-      }),
+          }),
       floatingActionButton: FloatingActionButton(
         onPressed: (){
           Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => ImageUpload())
+              MaterialPageRoute(builder: (context) => const ImageUpload())
           );
         },
         child: const Icon(Icons.image_outlined),

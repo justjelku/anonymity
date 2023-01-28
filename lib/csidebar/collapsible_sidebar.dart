@@ -35,7 +35,7 @@ class _NavBarState extends State<NavBar> {
     super.initState();
     getUsers();
   }
-  
+
 
   getUsers() async {
     var url = 'https://63c95a0e320a0c4c9546afb1.mockapi.io/api/users';
@@ -53,95 +53,28 @@ class _NavBarState extends State<NavBar> {
       child: ListView(
         children: [
           UserAccountsDrawerHeader(
-            accountName: Text("${widget.data[0]['username']}"),
-            accountEmail: Text('${widget.data[0]['email']}'),
-            currentAccountPicture: CircleAvatar(
-              child: Stack(
-                  children: [
-                    CircleAvatar(
-                      radius: 50,
-                      backgroundColor: Colors.black,
-                      child: ClipOval(
-                        child: SizedBox(
-                          width: 150.0,
-                          height: 100.0,
-                          child: Image.network(
-                            "${widget.data[0]['avatar']}",
-                            fit: BoxFit.fill,
+              accountName: Text("${widget.data[0]['username']}"),
+              accountEmail: Text('${widget.data[0]['email']}'),
+              currentAccountPicture: CircleAvatar(
+                  child: Stack(
+                      children: [
+                        CircleAvatar(
+                          radius: 50,
+                          backgroundColor: Colors.black,
+                          child: ClipOval(
+                            child: SizedBox(
+                              width: 150.0,
+                              height: 100.0,
+                              child: Image.network(
+                                "${widget.data[0]['avatar']}",
+                                fit: BoxFit.fill,
+                              ),
+                            ),
                           ),
                         ),
-                      ),
-                    ),
-
-                    //use Positioned
-                    // Positioned(
-                    //   bottom: 0,
-                    //   right: 0,
-                    //   child: Column(
-                    //     children: <Widget>[
-                    //       IconButton(
-                    //         // padding: const EdgeInsets.all(15),
-                    //         icon: const Icon(Icons.camera_alt),
-                    //         color: Colors.white,
-                    //         onPressed: () {
-                    //           showDialog(
-                    //             context: context,
-                    //             builder: (ctx) => AlertDialog(
-                    //               title: const Text("Please choose"),
-                    //               content: const Text("From:"),
-                    //               actions: <Widget>[
-                    //                 TextButton(
-                    //                   onPressed: () async {
-                    //                     // getCam();
-                    //                     PermissionStatus cameraStatus = await Permission.camera.request();
-                    //                     if (cameraStatus == PermissionStatus.granted) {
-                    //                       getCam(ImageSource.camera);
-                    //                     } else if (cameraStatus == PermissionStatus.denied) {
-                    //                       return ;
-                    //                     }
-                    //
-                    //                   },
-                    //                   child: Container(
-                    //                     padding: const EdgeInsets.all(5),
-                    //                     child: const Text("Camera"),
-                    //                   ),
-                    //                 ),
-                    //                 TextButton(
-                    //                   onPressed: () async {
-                    //                     // getGall();
-                    //                     PermissionStatus cameraStatus = await Permission.storage.request();
-                    //                     if (cameraStatus == PermissionStatus.granted) {
-                    //                       getGall(ImageSource.gallery);
-                    //                     } else if (cameraStatus == PermissionStatus.denied) {
-                    //                       return;
-                    //                     }
-                    //
-                    //                   },
-                    //                   child: Container(
-                    //                     padding: const EdgeInsets.all(5),
-                    //                     child: const Text("Gallery"),
-                    //                   ),
-                    //                 ),
-                    //                 TextButton(
-                    //                   onPressed: () {
-                    //                     Navigator.of(ctx).pop();
-                    //                   },
-                    //                   child: Container(
-                    //                     padding: const EdgeInsets.all(5),
-                    //                     child: const Text("Cancel"),
-                    //                   ),
-                    //                 ),
-                    //               ],
-                    //             ),
-                    //           );
-                    //         },
-                    //       ),
-                    //     ],
-                    //   ),
-                    // ),
-                  ]
-              )
-            ),
+                      ]
+                  )
+              ),
               decoration: const BoxDecoration(
                 color: Colors.greenAccent,
                 image: DecorationImage(
@@ -155,8 +88,8 @@ class _NavBarState extends State<NavBar> {
             title: const Text ('Home'),
             onTap: () {
               Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => HomePage(data: widget.data))
+                  context,
+                  MaterialPageRoute(builder: (context) => HomePage(data: widget.data))
               );
             },
           ),

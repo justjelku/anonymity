@@ -277,7 +277,6 @@ class _LoginPageState extends State<LoginPage> {
                       email: emailController.text,
                     );
                     db.insertData(dataLocal);
-                    print(db);
                     setState(() {
                       postAccount(
                           currentIndex,
