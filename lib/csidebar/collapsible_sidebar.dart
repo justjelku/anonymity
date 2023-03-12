@@ -1,7 +1,7 @@
-import 'package:finalproject/csidebar/image_share.dart';
+import 'package:finalproject/constant.dart';
+import 'package:finalproject/csidebar/photouploads.dart';
 import 'package:finalproject/csidebar/settings.dart';
 import 'package:finalproject/screen/auth/login_page.dart';
-import 'package:finalproject/csidebar/contact_us.dart';
 import 'package:finalproject/screen/home.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
@@ -38,7 +38,7 @@ class _NavBarState extends State<NavBar> {
 
 
   getUsers() async {
-    var url = 'https://63c95a0e320a0c4c9546afb1.mockapi.io/api/users';
+    var url = 'https://640d7547b07afc3b0dadbf4d.mockapi.io/users';
     var response = await http.get(Uri.parse(url));
 
     setState( () {
@@ -50,11 +50,20 @@ class _NavBarState extends State<NavBar> {
   @override
   Widget build(BuildContext context) {
     return Drawer(
+      backgroundColor: primaryBGColor,
       child: ListView(
         children: [
           UserAccountsDrawerHeader(
-              accountName: Text("${widget.data[0]['username']}"),
-              accountEmail: Text('${widget.data[0]['email']}'),
+              accountName: Text("${widget.data[0]['username']}",
+                style: TextStyle(
+                  color: mainTextColor,
+                ),
+              ),
+              accountEmail: Text('${widget.data[0]['email']}',
+                style: TextStyle(
+                  color: mainTextColor,
+                ),
+              ),
               currentAccountPicture: CircleAvatar(
                   child: Stack(
                       children: [
@@ -86,8 +95,14 @@ class _NavBarState extends State<NavBar> {
               )
           ),
           ListTile(
-            leading: const Icon(Icons.home),
-            title: const Text ('Home'),
+            leading: Icon(Icons.home,
+              color: mainTextColor,
+            ),
+            title: Text ('Home',
+              style: TextStyle(
+                color: mainTextColor,
+              ),
+            ),
             onTap: () {
               Navigator.push(
                   context,
@@ -100,8 +115,14 @@ class _NavBarState extends State<NavBar> {
             },
           ),
           ListTile(
-            leading: const Icon(Icons.image_rounded),
-            title: const Text ('Image Share'),
+            leading: Icon(Icons.image_rounded,
+              color: mainTextColor,
+            ),
+            title: Text ('Photo Uploads',
+              style: TextStyle(
+                color: mainTextColor,
+              ),
+            ),
             onTap: () {
               Navigator.push(
                   context,
@@ -111,40 +132,56 @@ class _NavBarState extends State<NavBar> {
             },
           ),
           ListTile(
-            leading: const Icon(
-                Icons.settings
+            leading: Icon(
+                Icons.settings,
+              color: mainTextColor,
             ),
-            title: const Text('Settings'),
+            title: Text('Settings',
+              style: TextStyle(
+                color: mainTextColor,
+              ),
+            ),
             onTap: () {
               userId = int.parse(widget.data[0]['id']);
               Navigator.push(
                   context,
                   MaterialPageRoute(
                       builder: (context) => Settings(
-                          data: userId
+                          data: userId,
                       )
                   )
               );
             },
           ),
-          ListTile(
-            leading: const Icon(
-                Icons.email
-            ),
-            title: const Text('Contact Us'),
-            onTap: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const ContactUs()
-                  )
-              );
-            },
-          ),
+          // ListTile(
+          //   leading: Icon(
+          //       Icons.email,
+          //     color: mainTextColor,
+          //   ),
+          //   title: Text('Profile',
+          //     style: TextStyle(
+          //       color: mainTextColor,
+          //     ),
+          //   ),
+          //   onTap: () {
+          //     Navigator.push(
+          //         context,
+          //         MaterialPageRoute(
+          //             builder: (context) => const Profile()
+          //         )
+          //     );
+          //   },
+          // ),
           const Divider(),
           ListTile(
-            title: const Text('Log Out'),
-            leading: const Icon(Icons.logout_sharp),
+            title: Text('Log Out',
+              style: TextStyle(
+                color: mainTextColor,
+              ),
+            ),
+            leading: Icon(Icons.logout_sharp,
+              color: mainTextColor,
+            ),
             onTap: () {
               Navigator.push(
                   context,

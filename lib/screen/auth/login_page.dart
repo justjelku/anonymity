@@ -1,3 +1,4 @@
+import 'package:finalproject/constant.dart';
 import 'package:flutter/material.dart';
 import 'package:finalproject/util/data_model.dart';
 import 'package:finalproject/util/database.dart';
@@ -11,7 +12,7 @@ import 'package:themed/themed.dart';
 
 Future<DataModel> postAccount(int? id, String firstname, String lastname, String username, String password, String email) async {
   final response = await http.post(
-    Uri.parse("https://63c95a0e320a0c4c9546afb1.mockapi.io/api/users"),
+    Uri.parse("https://640d7547b07afc3b0dadbf4d.mockapi.io/users"),
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
     },
@@ -76,7 +77,7 @@ class _LoginPageState extends State<LoginPage> {
 
 
   getUsers() async {
-    var url = 'https://63c95a0e320a0c4c9546afb1.mockapi.io/api/users';
+    var url = 'https://640d7547b07afc3b0dadbf4d.mockapi.io/users';
     var response = await http.get(Uri.parse(url));
 
     setState( () {
@@ -89,7 +90,7 @@ class _LoginPageState extends State<LoginPage> {
     var username = userNameController.text;
     var password = passwordController.text;
 
-    for (var i = 0; i <= accounts.length; i++) {
+    for (var i = 0; i < accounts.length; i++) {
       if (username == accounts[i]['username'] &&
           password == accounts[i]['password']) {
         _showMsg('Login Success');
@@ -98,16 +99,21 @@ class _LoginPageState extends State<LoginPage> {
             context,
             MaterialPageRoute(builder: (context) => HomePage(data: account))
         );
-        break;
+        return;
       }
     }
-
+    // Display error message
+    _showMsg('Incorrect username or password');
   }
+
+
   _showMsg(msg) {
     final snackBar = SnackBar(
+      backgroundColor: primaryBGColor,
         content: Text(msg),
         action: SnackBarAction(
           label: 'Close',
+          textColor: mainTextColor,
           onPressed: () {},
         )
     );
@@ -133,6 +139,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        backgroundColor: gradientEndColor,
         body: Form(
             key: formKey,
             child: ListView(
@@ -146,9 +153,21 @@ class _LoginPageState extends State<LoginPage> {
                           width: 300,
                           height: 300)
                   ),
-                  const Text("ANONYMITY", style: TextStyle(fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
+                  const Text("ANONYMITY 2.0",
+                      style: TextStyle(
+                          fontSize: 20,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold
+                      ),
+                      textAlign: TextAlign.center
+                  ),
                   const SizedBox(height: 25),
-                  Text("Welcome $displayUser !", style: const TextStyle(fontSize: 15, color: Colors.white, fontStyle: FontStyle.italic), textAlign: TextAlign.center),
+                  Text("Welcome $displayUser !",
+                      style: const TextStyle(
+                          fontSize: 15,
+                          color: Colors.white,
+                          fontStyle: FontStyle.italic),
+                      textAlign: TextAlign.center),
                   const SizedBox(height: 20),
                   TextFormField(
                     controller: userNameController,
@@ -156,10 +175,10 @@ class _LoginPageState extends State<LoginPage> {
                     decoration: InputDecoration(
                       labelText: "Username",
                       contentPadding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0)),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(50)),
                     ),
                     validator: (value){
-                      return (value == '')? "Input Name" : null;
+                      return (value == '')? "Username" : null;
                     },
                   ),
                   const SizedBox(height: 10),
@@ -169,9 +188,9 @@ class _LoginPageState extends State<LoginPage> {
                       obscureText: true,
                       decoration: InputDecoration(
                         labelText: 'Password',
-                        hintText: 'Enter your password',
+                        hintText: 'Password',
                         contentPadding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0)),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(50)),
                       )
                   ),
                   const SizedBox(height: 10),
@@ -179,16 +198,44 @@ class _LoginPageState extends State<LoginPage> {
                       onPressed: () {
                         loginData();
                       },
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.greenAccent
+                      style: ButtonStyle(
+                        padding: MaterialStateProperty.all<EdgeInsets>(
+                          const EdgeInsets.symmetric(vertical: 20.0, horizontal: 10.0),
+                        ),
+                        backgroundColor: MaterialStateProperty.all<Color>(primaryBtnColor),
+                        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(50),
+                          ),
+                        ),
                       ),
-                      child: const Text("Sign In", style: TextStyle(color: Colors.black, fontSize: 17))
+
+                      child: const Text("Sign In",
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 17
+                          )
+                      )
                   ),
                   TextButton(
                       onPressed: (){
                         showMyDialogue();
                       },
-                      child: const Text("Create Account")
+                      style: ButtonStyle(
+                        padding: MaterialStateProperty.all<EdgeInsets>(
+                          const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
+                        ),
+                        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(50),
+                          ),
+                        ),
+                      ),
+                      child: const Text("Create Account",
+                      style: TextStyle(
+                        color: Colors.black,
+                      ),
+                      )
                   )
                 ]
             )
@@ -201,10 +248,18 @@ class _LoginPageState extends State<LoginPage> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20.0),
+            ),
+            backgroundColor: gradientEndColor,
             scrollable: true,
-            title: const Text('Create Account'),
-            content: Padding(
-              padding: const EdgeInsets.all(8.0),
+            title: Text('Create Account',
+              style: TextStyle(
+                color: mainTextColor,
+              ),
+            ),
+            content: Container(
+              padding: const EdgeInsets.all(10.0),
               child: Form(
                 autovalidateMode: AutovalidateMode.onUserInteraction,
                 child: Column(
@@ -212,30 +267,39 @@ class _LoginPageState extends State<LoginPage> {
                     TextFormField(
                       controller: firstNameController,
                       keyboardType: TextInputType.name,
-                      decoration: const InputDecoration(
-                          labelText: "First Name"),
+                      decoration: InputDecoration(
+                          labelText: "First Name",
+                        labelStyle: TextStyle(color: mainTextColor),
+                        hintStyle: TextStyle(color: mainTextColor),
+                      ),
                       validator: (value){
-                        return (value == '')? "Input First Name" : null;
+                        return (value == '')? "First Name" : null;
                       },
                     ),
                     const SizedBox(height: 10),
                     TextFormField(
                       controller: lastNameController,
                       keyboardType: TextInputType.name,
-                      decoration: const InputDecoration(
-                          labelText: "Last Name"),
+                      decoration: InputDecoration(
+                          labelText: "Last Name",
+                        labelStyle: TextStyle(color: mainTextColor),
+                        hintStyle: TextStyle(color: mainTextColor),
+                      ),
                       validator: (value){
-                        return (value == '')? "Input Last Name" : null;
+                        return (value == '')? "Last Name" : null;
                       },
                     ),
                     const SizedBox(height: 10),
                     TextFormField(
                       controller: userNameController,
                       keyboardType: TextInputType.name,
-                      decoration: const InputDecoration(
-                          labelText: "Username"),
+                      decoration: InputDecoration(
+                          labelText: "Username",
+                        labelStyle: TextStyle(color: mainTextColor),
+                        hintStyle: TextStyle(color: mainTextColor),
+                      ),
                       validator: (value){
-                        return (value == '')? "Input Username" : null;
+                        return (value == '')? "Username" : null;
                       },
                     ),
                     const SizedBox(height: 10),
@@ -243,20 +307,26 @@ class _LoginPageState extends State<LoginPage> {
                       controller: passwordController,
                       keyboardType: TextInputType.name,
                       obscureText: true,
-                      decoration: const InputDecoration(
-                          labelText: "Password"),
+                      decoration: InputDecoration(
+                          labelText: "Password",
+                        labelStyle: TextStyle(color: mainTextColor),
+                        hintStyle: TextStyle(color: mainTextColor),
+                      ),
                       validator: (value){
-                        return (value == '')? "Input Password" : null;
+                        return (value == '')? "Password" : null;
                       },
                     ),
                     const SizedBox(height: 10),
                     TextFormField(
                       controller: emailController,
                       keyboardType: TextInputType.emailAddress,
-                      decoration: const InputDecoration(
-                          labelText: "Email Address"),
+                      decoration: InputDecoration(
+                          labelText: "Email Address",
+                        labelStyle: TextStyle(color: mainTextColor),
+                        hintStyle: TextStyle(color: mainTextColor),
+                      ),
                       validator: (value){
-                        return (value == '')? "Input Email Address" : null;
+                        return (value == '')? "Email Address" : null;
                       },
                     ),
                   ],
@@ -264,9 +334,10 @@ class _LoginPageState extends State<LoginPage> {
               ),
             ),
             actions: [
-              TextButton(
+              ElevatedButton(
                 onPressed: () {
                   if (formKey.currentState!.validate()) {
+                    // Validation passed, no blank fields found
                     Navigator.pop(context);
                     currentIndex = accounts.indexOf('id', 0);
                     DataModel dataLocal = DataModel(
@@ -292,10 +363,32 @@ class _LoginPageState extends State<LoginPage> {
                     userNameController.clear();
                     passwordController.clear();
                     emailController.clear();
+                  } else {
+                    // Validation failed, at least one field is blank
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Please fill out all fields.'),
+                      ),
+                    );
                   }
                 },
-                child: const Center(
-                  child: Text("Sign Up"),
+                style: ButtonStyle(
+                  padding: MaterialStateProperty.all<EdgeInsets>(
+                    const EdgeInsets.symmetric(vertical: 20.0, horizontal: 10.0),
+                  ),
+                  backgroundColor: MaterialStateProperty.all<Color>(primaryBtnColor),
+                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                    RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(50),
+                    ),
+                  ),
+                ),
+                child: Center(
+                  child: Text("Sign Up",
+                    style: TextStyle(
+                      color: mainTextColor,
+                    ),
+                  ),
                 ),
               ),
             ],

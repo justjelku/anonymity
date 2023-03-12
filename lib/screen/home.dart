@@ -1,3 +1,7 @@
+import 'dart:convert';
+
+import 'package:finalproject/constant.dart';
+import 'package:finalproject/likebutton.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -19,7 +23,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
 
-
+  bool isLoading = true;
   List posts = <dynamic>[];
   List users = <dynamic>[];
   int postId = 0;
@@ -28,6 +32,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void initState() {
+    fetchTodo();
     getPosts();
     getUsers();
     setUser();
@@ -38,8 +43,6 @@ class _HomePageState extends State<HomePage> {
     SharedPreferences pref = await SharedPreferences.getInstance();
     pref.setString("displayUser", widget.data[0]['username']);
   }
-
-
 
   getUsers() async {
     var url = 'https://63c95a0e320a0c4c9546afb1.mockapi.io/api/users';
@@ -61,137 +64,191 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  getPosts() async {
-    var url = 'https://63cb9d8cea85515415128b2b.mockapi.io/api/posts';
-    var response = await http.get(Uri.parse(url));
+  Future<List<dynamic>> getPosts() async {
+    var url = 'https://640d2439b07afc3b0da82c47.mockapi.io/posts';
+    var headers = {'Cache-Control': 'no-cache'};
+    var response = await http.get(Uri.parse(url), headers: headers);
 
-    setState(() {
-      posts = convert.jsonDecode(response.body) as List<dynamic>;
-    });
+    if (response.statusCode == 200) {
+      List<dynamic> posts = jsonDecode(response.body);
+      return posts;
+    } else {
+      throw Exception('Failed to load posts');
+    }
   }
+
+  //   Future<void> deletePosts(int postId) async {
+  //
+  //   setState(() {
+  //     isLoading = true;
+  //   });
+  //
+  //   var url = 'https://640d2439b07afc3b0da82c47.mockapi.io/posts/$postId';
+  //   var response = await http.delete(Uri.parse(url));
+  //
+  //   if (response.statusCode == 200) {
+  //     // final filtered = posts.where((element) => element['_id'] != id).toList();
+  //
+  //     print('Post successfully deleted!');
+  //     fetchTodo();
+  //   } else {
+  //     print('Failed to delete post.');
+  //   }
+  //   setState(() {
+  //     // posts = filtered;
+  //     isLoading = false;
+  //   });
+  // }
+
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-        length: 2,
-        child: Scaffold(
+    return Scaffold(
           appBar: AppBar(
-            title: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: const <Widget>[
-                Expanded(
-                  flex: 1,
-                  child: TextField(
-                    decoration: InputDecoration(
-                        border: InputBorder.none,
-                        hintText: "Search",
-                        hintStyle: TextStyle(
-                          color: Colors.white54,
-                        ),
-                        icon: Icon(
-                          Icons.search,
-                          color: Colors.white54,
-                        )
-                    ),
-                  ),
-                )
-              ],
-            ),
+            backgroundColor: primaryBGColor,
+            title: const Text("Anonymity",
+            style: TextStyle(
+                fontFamily: 'Arial',
+                fontWeight: FontWeight.bold
+            )),
+            centerTitle: true,
           ),
           drawer: NavBar(data: widget.data),
-          body: ListView.builder(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            itemCount: posts.length,
-            itemBuilder: (context, index) {
-              return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 5),
-                child: InkWell(
+          backgroundColor: gradientEndColor,
+          body: FutureBuilder<List<dynamic>>(
+            future: getPosts(),
+            builder: (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
+              if (snapshot.hasError) {
+                return Center(child: Text('Error: ${snapshot.error}'));
+              }
+              if (!snapshot.hasData || snapshot.data == null || snapshot.data!.isEmpty) {
+                return Center(
                   child: Column(
-                    children: <Widget>[
-                      ListTile(
-                        leading: CircleAvatar(
-                          child: Image.network(
-                            "${posts[index]['avatar']}",
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      CircularProgressIndicator(),
+                      SizedBox(height: 16.0),
+                      Text('Loading...'),
+                    ],
+                  ));
+              }
+              List<dynamic> posts = snapshot.data!;
+              return ListView.builder(
+                physics: const AlwaysScrollableScrollPhysics(),
+                // padding: const EdgeInsets.symmetric(horizontal: 20),
+                itemCount: posts.length,
+                itemBuilder: (context, index) {
+                  // final item = posts[index]['postId'] as String;
+                  return Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.5),
+                          spreadRadius: 2,
+                          blurRadius: 5,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: InkWell(
+                      child: Column(
+                        children: <Widget>[
+                          const SizedBox(
+                            height: 10,
                           ),
-                        ),
-                        contentPadding: const EdgeInsets.all(0),
-                        title: Text(
-                          "${posts[index]['user']}",
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        trailing: Text(
-                          "${posts[index]['createdAt']}",
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w300,
-                            fontSize: 11,
-                          ),
-                        ),
-                      ),
-                      ListTile(
-                        title: Text(
-                            '${posts[index]['message']}'
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 10.0,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: <Widget> [
-                          TextButton.icon(
-                            onPressed: (){},
-                            icon: const Icon(
-                              Icons.thumb_up_outlined,
-                              color: Colors.white,
+                          ListTile(
+                            leading: ClipRRect(
+                              borderRadius: const BorderRadius.all(
+                                Radius.circular(100),
+                              ),
+                              child: Image.network(
+                                "${posts[index]['avatar']}",
+                              ),
                             ),
-                            label: const Text(
-                              "Like",
+                            contentPadding: const EdgeInsets.all(10),
+                            title: Text(
+                              "${posts[index]['user']}",
                               style: TextStyle(
-                                  color: Colors.white
+                                fontWeight: FontWeight.bold,
+                                color: mainTextColor,
                               ),
                             ),
                           ),
+                          ListTile(
+                            title: Text(
+                                '${posts[index]['message']}',
+                              style: TextStyle(
+                                color: mainTextColor,
+                              ),
+                            ),
+                          ),
+                          SizedBox(
+                            height: 250,
+                            width: 350,
+                            child: Card(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20.0),
+                              ),
+                              elevation: 5  ,
+                              child: ClipRRect(
+                                borderRadius: const BorderRadius.all(
+                                  Radius.circular(20.0),
+                                ),
+                                child: Image.network(
+                                  "${posts[index]['avatar']}",
+                                  fit: BoxFit.fitWidth,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 10.0,
+                          ),
                           Row(
-                            children: [
-                              TextButton.icon(
-                                onPressed: (){
-                                  postId = int.parse(posts[index]['postId']);
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(builder: (context) => Comments(
-                                          data: int.parse(
-                                              posts[index]['postId'])
-                                      ))
-                                  );
-                                },
-                                icon: const Icon(
-                                  Icons.comment_outlined,
-                                  color: Colors.white,
-                                ),
-                                label: const Text(
-                                  "Comment",
-                                  style: TextStyle(
-                                      color: Colors.white
+                            children: <Widget> [
+                              const Center(
+                                child: LikeButton(),
+                              ),
+                              Row(
+                                children: [
+                                  TextButton.icon(
+                                    onPressed: (){
+                                      postId = int.parse(posts[index]['postId']);
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(builder: (context) => Comments(
+                                              data: int.parse(
+                                                  posts[index]['postId'])
+                                          ))
+                                      );
+                                    },
+                                    icon: const Icon(
+                                      Icons.chat_bubble_outline_outlined,
+                                      color: Colors.white,
+                                    ),
+                                    label: const Text(
+                                      "",
+                                      style: TextStyle(
+                                          color: Colors.white
+                                      ),
+                                    ),
                                   ),
-                                ),
+                                ],
                               ),
                             ],
                           ),
+                          const SizedBox(
+                            height: 10,
+                          ),
                         ],
                       ),
-                      const Divider(
-                        height: 10,
-                        thickness: 2,
-                        indent: 5,
-                        endIndent: 5,
-                      ),
-                    ],
-                  ),
-                ),
+                    ),
+                  );
+                }
               );
-            },
+            }
           ),
           floatingActionButton: FloatingActionButton(
             onPressed: (){
@@ -200,9 +257,28 @@ class _HomePageState extends State<HomePage> {
                   MaterialPageRoute(builder: (context) => const CreatePost())
               );
             },
-            child: const Icon(Icons.create_outlined),
+            backgroundColor: primaryBtnColor,
+            child: Icon(Icons.add,
+            color: mainTextColor,),
           ),
-        )
-    );
+        );
+  }
+  Future<void> fetchTodo() async {
+    setState(() {
+      isLoading = true;
+    });
+    var url = 'https://640d2439b07afc3b0da82c47.mockapi.io/posts';
+    var headers = {'Cache-Control': 'no-cache'};
+    var response = await http.get(Uri.parse(url), headers: headers);
+    if (response.statusCode == 200) {
+      final json = convert.jsonDecode(response.body) as Map;
+      final result = json['posts'] as List;
+      setState(() {
+        posts = result;
+      });
+    }
+    setState(() {
+      isLoading = false;
+    });
   }
 }

@@ -5,6 +5,11 @@ import 'package:path/path.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+Color primaryBGColor = const Color(0xFF000000);
+Color primaryBtnColor = const Color(0xFF07AF3F);
+Color mainTextColor = const Color(0xFFFFFFFF);
+Color gradientEndColor = const Color(0xFFEAA626);
+
 class ImageUpload extends StatefulWidget {
   const ImageUpload({Key? key}) : super(key: key);
 
@@ -30,7 +35,7 @@ class _ImageUploadState extends State<ImageUpload> {
   }
 
   uploadImage(File image) async {
-    var request = http.MultipartRequest("POST", Uri.parse("https://63c95a0e320a0c4c9546afb1.mockapi.io/api/images_share"));
+    var request = http.MultipartRequest("POST", Uri.parse("https://640d7547b07afc3b0dadbf4d.mockapi.io/users/1/image_uploads"));
     request.fields["image"] = _image.toString();
     request.files.add(
         http.MultipartFile.fromBytes(
@@ -45,7 +50,9 @@ class _ImageUploadState extends State<ImageUpload> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: gradientEndColor,
         appBar: AppBar(
+          backgroundColor: primaryBGColor,
           title: const Text('Image Upload'),
         ),
         body: SafeArea(
@@ -56,7 +63,14 @@ class _ImageUploadState extends State<ImageUpload> {
                   Center(
                     child: ElevatedButton(
                       onPressed: _openImagePicker,
-                      child: const Text('Select An Image'),
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all<Color>(primaryBtnColor),
+                      ),
+                      child: Text('Select An Image',
+                        style: TextStyle(
+                          color: mainTextColor,
+                        ),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 35),
@@ -64,18 +78,31 @@ class _ImageUploadState extends State<ImageUpload> {
                     alignment: Alignment.center,
                     width: double.infinity,
                     height: 300,
-                    color: Colors.grey[300],
+                    color: primaryBGColor,
                     child: _image != null
                         ? Image.file(_image!, fit: BoxFit.cover)
-                        : const Text('Please select an image'),
+                        : Text('Please select an image',
+                      style: TextStyle(
+                        color: mainTextColor,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 35,
                   ),
                   ElevatedButton(
                       onPressed: (){
                         uploadImage(_image!);
-
                         Navigator.pop(context);
                       },
-                      child: const Text("Upload")
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all<Color>(primaryBtnColor),
+                      ),
+                      child: Text("Upload",
+                        style: TextStyle(
+                          color: mainTextColor,
+                        ),
+                      )
                   )
               ]
             ),
@@ -87,7 +114,7 @@ class _ImageUploadState extends State<ImageUpload> {
   upload(File imageFile) async {
     var stream = http.ByteStream(Stream.castFrom(imageFile.openRead()));
     var length = await imageFile.length();
-    var uri = Uri.parse("https://63c95a0e320a0c4c9546afb1.mockapi.io/api/image_share");
+    var uri = Uri.parse("https://640d7547b07afc3b0dadbf4d.mockapi.io/users/1/image_uploads");
     var request = http.MultipartRequest("POST", uri);
     var multipartFile = http.MultipartFile('file', stream, length,
         filename: basename(imageFile.path));
