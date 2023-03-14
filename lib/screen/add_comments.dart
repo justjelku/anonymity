@@ -1,6 +1,6 @@
 import 'dart:io';
-import 'package:finalproject/constant.dart';
-import 'package:finalproject/screen/display_comments.dart';
+import 'package:anonymity/constant.dart';
+import 'package:anonymity/screen/display_comments.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;

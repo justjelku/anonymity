@@ -1,5 +1,5 @@
-import 'package:finalproject/constant.dart';
-import 'package:finalproject/screen/auth/login_page.dart';
+import 'package:anonymity/constant.dart';
+import 'package:anonymity/screen/auth/login_page.dart';
 import 'package:flutter/material.dart';
 import '../util/data_model.dart';
 import '../util/database.dart';

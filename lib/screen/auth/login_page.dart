@@ -1,8 +1,8 @@
-import 'package:finalproject/constant.dart';
+import 'package:anonymity/constant.dart';
 import 'package:flutter/material.dart';
-import 'package:finalproject/util/data_model.dart';
-import 'package:finalproject/util/database.dart';
-import 'package:finalproject/screen/home.dart';
+import 'package:anonymity/util/data_model.dart';
+import 'package:anonymity/util/database.dart';
+import 'package:anonymity/screen/home.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';

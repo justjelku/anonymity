@@ -1,8 +1,8 @@
-import 'package:finalproject/constant.dart';
-import 'package:finalproject/csidebar/photouploads.dart';
-import 'package:finalproject/csidebar/settings.dart';
-import 'package:finalproject/screen/auth/login_page.dart';
-import 'package:finalproject/screen/home.dart';
+import 'package:anonymity/constant.dart';
+import 'package:anonymity/csidebar/photouploads.dart';
+import 'package:anonymity/csidebar/settings.dart';
+import 'package:anonymity/screen/auth/login_page.dart';
+import 'package:anonymity/screen/home.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:shared_preferences/shared_preferences.dart';
