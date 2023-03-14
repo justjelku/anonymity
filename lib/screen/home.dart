@@ -33,8 +33,9 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     fetchTodo();
-    getPosts();
+    // getPosts();
     getUsers();
+    getUser();
     setUser();
     super.initState();
   }
@@ -65,7 +66,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<List<dynamic>> getPosts() async {
-    var url = 'https://640d2439b07afc3b0da82c47.mockapi.io/posts';
+    var url = 'https://640dc456b07afc3b0db58266.mockapi.io/posts';
     var headers = {'Cache-Control': 'no-cache'};
     var response = await http.get(Uri.parse(url), headers: headers);
 
@@ -77,28 +78,42 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  //   Future<void> deletePosts(int postId) async {
-  //
-  //   setState(() {
-  //     isLoading = true;
-  //   });
-  //
-  //   var url = 'https://640d2439b07afc3b0da82c47.mockapi.io/posts/$postId';
-  //   var response = await http.delete(Uri.parse(url));
-  //
-  //   if (response.statusCode == 200) {
-  //     // final filtered = posts.where((element) => element['_id'] != id).toList();
-  //
-  //     print('Post successfully deleted!');
-  //     fetchTodo();
-  //   } else {
-  //     print('Failed to delete post.');
-  //   }
-  //   setState(() {
-  //     // posts = filtered;
-  //     isLoading = false;
-  //   });
-  // }
+  Future<void> deletePost(String postId) async {
+    setState(() {
+      isLoading = true;
+    });
+
+    var url = 'https://640dc456b07afc3b0db58266.mockapi.io/posts/${int.parse(postId)}';
+    var response = await http.delete(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      setState(() {
+        posts.removeWhere((post) => post['postId'] == postId);
+        isLoading = false;
+      });
+      _showMsg('Post successfully deleted!');
+    } else {
+      setState(() {
+        isLoading = false;
+      });
+      _showMsg('Failed to delete post.');
+    }
+  }
+
+
+  _showMsg(msg) {
+    final snackBar = SnackBar(
+        backgroundColor: primaryBGColor,
+        content: Text(msg),
+        action: SnackBarAction(
+          label: 'Close',
+          textColor: mainTextColor,
+          onPressed: () {},
+        )
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
 
 
   @override
@@ -115,140 +130,184 @@ class _HomePageState extends State<HomePage> {
           ),
           drawer: NavBar(data: widget.data),
           backgroundColor: gradientEndColor,
-          body: FutureBuilder<List<dynamic>>(
-            future: getPosts(),
-            builder: (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
-              if (snapshot.hasError) {
-                return Center(child: Text('Error: ${snapshot.error}'));
-              }
-              if (!snapshot.hasData || snapshot.data == null || snapshot.data!.isEmpty) {
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
-                      CircularProgressIndicator(),
-                      SizedBox(height: 16.0),
-                      Text('Loading...'),
-                    ],
-                  ));
-              }
-              List<dynamic> posts = snapshot.data!;
-              return ListView.builder(
-                physics: const AlwaysScrollableScrollPhysics(),
-                // padding: const EdgeInsets.symmetric(horizontal: 20),
-                itemCount: posts.length,
-                itemBuilder: (context, index) {
-                  // final item = posts[index]['postId'] as String;
-                  return Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.5),
-                          spreadRadius: 2,
-                          blurRadius: 5,
-                          offset: const Offset(0, 3),
-                        ),
-                      ],
-                    ),
-                    child: InkWell(
-                      child: Column(
-                        children: <Widget>[
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          ListTile(
-                            leading: ClipRRect(
-                              borderRadius: const BorderRadius.all(
-                                Radius.circular(100),
-                              ),
-                              child: Image.network(
-                                "${posts[index]['avatar']}",
-                              ),
-                            ),
-                            contentPadding: const EdgeInsets.all(10),
-                            title: Text(
-                              "${posts[index]['user']}",
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: mainTextColor,
-                              ),
-                            ),
-                          ),
-                          ListTile(
-                            title: Text(
-                                '${posts[index]['message']}',
-                              style: TextStyle(
-                                color: mainTextColor,
-                              ),
-                            ),
-                          ),
-                          SizedBox(
-                            height: 250,
-                            width: 350,
-                            child: Card(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20.0),
-                              ),
-                              elevation: 5  ,
-                              child: ClipRRect(
-                                borderRadius: const BorderRadius.all(
-                                  Radius.circular(20.0),
-                                ),
-                                child: Image.network(
-                                  "${posts[index]['avatar']}",
-                                  fit: BoxFit.fitWidth,
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(
-                            height: 10.0,
-                          ),
-                          Row(
-                            children: <Widget> [
-                              const Center(
-                                child: LikeButton(),
-                              ),
-                              Row(
-                                children: [
-                                  TextButton.icon(
-                                    onPressed: (){
-                                      postId = int.parse(posts[index]['postId']);
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(builder: (context) => Comments(
-                                              data: int.parse(
-                                                  posts[index]['postId'])
-                                          ))
-                                      );
-                                    },
-                                    icon: const Icon(
-                                      Icons.chat_bubble_outline_outlined,
-                                      color: Colors.white,
-                                    ),
-                                    label: const Text(
-                                      "",
-                                      style: TextStyle(
-                                          color: Colors.white
-                                      ),
-                                    ),
-                                  ),
-                                ],
+          body: RefreshIndicator(
+            onRefresh: fetchTodo,
+            child: FutureBuilder<List<dynamic>>(
+                future: getPosts(),
+                builder: (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
+                  if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  }
+                  if (!snapshot.hasData || snapshot.data == null || snapshot.data!.isEmpty) {
+                    return Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: const [
+                            CircularProgressIndicator(),
+                            SizedBox(height: 16.0),
+                            Text('Loading...'),
+                          ],
+                        ));
+                  }
+                  List<dynamic> posts = snapshot.data!;
+                  return ListView.builder(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      // padding: const EdgeInsets.symmetric(horizontal: 20),
+                      itemCount: posts.length,
+                      itemBuilder: (context, index) {
+                        // final item = posts[index]['postId'] as String;
+                        return Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.5),
+                                spreadRadius: 2,
+                                blurRadius: 5,
+                                offset: const Offset(0, 3),
                               ),
                             ],
                           ),
-                          const SizedBox(
-                            height: 10,
+                          child: InkWell(
+                            child: Column(
+                              children: <Widget>[
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                ListTile(
+                                  leading: ClipRRect(
+                                    borderRadius: const BorderRadius.all(
+                                      Radius.circular(100),
+                                    ),
+                                    child: Image.network(
+                                      "${posts[index]['avatar']}",
+                                    ),
+                                  ),
+                                  contentPadding: const EdgeInsets.all(10),
+                                  title: Text(
+                                    "${posts[index]['user']}",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: mainTextColor,
+                                    ),
+                                  ),
+                                ),
+                                ListTile(
+                                  title: Text(
+                                    '${posts[index]['message']}',
+                                    style: TextStyle(
+                                      color: mainTextColor,
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: 250,
+                                  width: 350,
+                                  child: Card(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20.0),
+                                    ),
+                                    elevation: 5  ,
+                                    child: ClipRRect(
+                                      borderRadius: const BorderRadius.all(
+                                        Radius.circular(20.0),
+                                      ),
+                                      child: Image.network(
+                                        "${posts[index]['avatar']}",
+                                        fit: BoxFit.fitWidth,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(
+                                  height: 10.0,
+                                ),
+                                Row(
+                                  children: <Widget> [
+                                    Row(
+                                      children: [
+                                        const Center(
+                                          child: LikeButton(),
+                                        ),
+                                        IconButton(
+                                          onPressed: (){
+                                            postId = int.parse(posts[index]['postId']);
+                                            Navigator.push(
+                                                context,
+                                                MaterialPageRoute(builder: (context) => Comments(
+                                                    data: int.parse(
+                                                        posts[index]['postId'])
+                                                ))
+                                            );
+                                          },
+                                          icon: const Icon(
+                                            Icons.chat_bubble_outline_outlined,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                        IconButton(
+                                          onPressed: (){
+                                            showDialog(context: context,
+                                                builder: (context){
+                                                  return AlertDialog(
+                                                      backgroundColor: gradientEndColor,
+                                                      title: Text("Delete Post",
+                                                        style: TextStyle(
+                                                          color: mainTextColor,
+                                                        ),),
+                                                      content: Text("Are you sure you want to delete your post?",
+                                                        style: TextStyle(
+                                                          color: mainTextColor,
+                                                          fontSize: 12,
+                                                        ),
+                                                      ),
+                                                      actions: [
+                                                        TextButton(
+                                                          onPressed: (){
+                                                            Navigator.pop(context);
+                                                          },
+                                                          child: Text("No",
+                                                            style: TextStyle(
+                                                              color: mainTextColor,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        TextButton(
+                                                          onPressed: () {
+                                                            deletePost(posts[index]['postId']);
+                                                            Navigator.pop(context);
+                                                          },
+                                                          child: Text("Yes",
+                                                            style: TextStyle(
+                                                              color: mainTextColor,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ]
+                                                  );
+                                                });
+                                          },
+                                          icon: const Icon(
+                                            Icons.delete_outline,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                              ],
+                            ),
                           ),
-                        ],
-                      ),
-                    ),
+                        );
+                      }
                   );
                 }
-              );
-            }
+            ),
           ),
           floatingActionButton: FloatingActionButton(
             onPressed: (){
@@ -267,7 +326,7 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       isLoading = true;
     });
-    var url = 'https://640d2439b07afc3b0da82c47.mockapi.io/posts';
+    var url = 'https://640dc456b07afc3b0db58266.mockapi.io/posts';
     var headers = {'Cache-Control': 'no-cache'};
     var response = await http.get(Uri.parse(url), headers: headers);
     if (response.statusCode == 200) {

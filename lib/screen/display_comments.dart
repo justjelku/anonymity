@@ -3,16 +3,29 @@ import 'package:finalproject/constant.dart';
 import 'package:finalproject/likebutton.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'dart:convert' as convert;
 
-class DisplayComments extends StatelessWidget {
-
+class DisplayComments extends StatefulWidget {
   final List data;
   const DisplayComments({
     required this.data,
     Key? key}) : super(key: key);
 
+  @override
+  State<DisplayComments> createState() => _DisplayCommentsState();
+}
+
+class _DisplayCommentsState extends State<DisplayComments> {
+
+  List comments = <dynamic>[];
+  @override
+  void initState() {
+    fetchTodo();
+    super.initState();
+  }
+
   Future<List<dynamic>> getComments() async {
-    String apiUrl = 'https://640d2439b07afc3b0da82c47.mockapi.io/posts/1/comments';
+    String apiUrl = 'https://640dc456b07afc3b0db58266.mockapi.io/posts/1/comments';
     var response = await http.get(Uri.parse(apiUrl));
     if (response.statusCode == 200) {
       List<dynamic> comments = jsonDecode(response.body);
@@ -20,6 +33,62 @@ class DisplayComments extends StatelessWidget {
     } else {
       throw Exception('Failed to load comments');
     }
+  }
+
+  Future<void> deleteComment(String commentId) async {
+    setState(() {
+      isLoading = true;
+    });
+
+    var url = 'https://640dc456b07afc3b0db58266.mockapi.io/posts/1/comments/${int.parse(commentId)}';
+    var response = await http.delete(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      setState(() {
+        comments.removeWhere((comment) => comment['commentId'] == commentId);
+        isLoading = false;
+      });
+      _showMsg('Comment successfully deleted!');
+    } else {
+      setState(() {
+        isLoading = false;
+      });
+      _showMsg('Failed to delete comment.');
+    }
+  }
+
+  _showMsg(msg) {
+    final snackBar = SnackBar(
+        backgroundColor: primaryBGColor,
+        content: Text(msg),
+        action: SnackBarAction(
+          label: 'Close',
+          textColor: mainTextColor,
+          onPressed: () {},
+        )
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
+  bool isLoading = true;
+
+  Future<void> fetchTodo() async {
+    setState(() {
+      isLoading = true;
+    });
+    var url = 'https://640dc456b07afc3b0db58266.mockapi.io/posts/1/comments';
+    var headers = {'Cache-Control': 'no-cache'};
+    var response = await http.get(Uri.parse(url), headers: headers);
+    if (response.statusCode == 200) {
+      final json = convert.jsonDecode(response.body) as Map;
+      final result = json['comments'] as List;
+      setState(() {
+        comments = result;
+      });
+    }
+    setState(() {
+      isLoading = false;
+    });
   }
 
   @override
@@ -30,25 +99,27 @@ class DisplayComments extends StatelessWidget {
         backgroundColor: primaryBGColor,
         title: const Text("Comments"),
       ),
-      body: FutureBuilder<List<dynamic>>(
-        future: getComments(),
-        builder: (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
-          if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          }
-          if (!snapshot.hasData || snapshot.data == null || snapshot.data!.isEmpty) {
-            return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    CircularProgressIndicator(),
-                    SizedBox(height: 16.0),
-                    Text('Loading...'),
-                  ],
-                ));
-          }
-          List<dynamic> postComment = snapshot.data!;
-          return ListView.builder(
+      body: RefreshIndicator(
+        onRefresh: fetchTodo,
+        child: FutureBuilder<List<dynamic>>(
+          future: getComments(),
+          builder: (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
+            if (snapshot.hasError) {
+              return Center(child: Text('Error: ${snapshot.error}'));
+            }
+            if (!snapshot.hasData || snapshot.data == null || snapshot.data!.isEmpty) {
+              return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      CircularProgressIndicator(),
+                      SizedBox(height: 16.0),
+                      Text('Loading...'),
+                    ],
+                  ));
+            }
+            List<dynamic> postComment = snapshot.data!;
+            return ListView.builder(
               itemCount: postComment.length,
               itemBuilder: (context, index) {
                 return Container(
@@ -94,16 +165,64 @@ class DisplayComments extends StatelessWidget {
                       ),
                       ListTile(
                         title: Text('${postComment[index]['comment']}',
-                        style: TextStyle(
-                          color: mainTextColor,
+                          style: TextStyle(
+                            color: mainTextColor,
                           ),
                         ),
                       ),
-                      const Align(
-                        alignment: Alignment.centerLeft,
-                        child: SizedBox(
-                          child: LikeButton(),
-                        ),
+                      Row(
+                        children: <Widget>[
+                          const Center(
+                            child: LikeButton(),
+                          ),
+                          IconButton(
+                            onPressed: (){
+                              showDialog(context: context,
+                                  builder: (context){
+                                    return AlertDialog(
+                                        backgroundColor: gradientEndColor,
+                                        title: Text("Delete Comment",
+                                          style: TextStyle(
+                                            color: mainTextColor,
+                                          ),),
+                                        content: Text("Are you sure you want to delete your comment?",
+                                          style: TextStyle(
+                                            color: mainTextColor,
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: (){
+                                              Navigator.pop(context);
+                                            },
+                                            child: Text("No",
+                                              style: TextStyle(
+                                                color: mainTextColor,
+                                              ),
+                                            ),
+                                          ),
+                                          TextButton(
+                                            onPressed: () {
+                                              deleteComment(comments[index]['commentId']);
+                                              Navigator.pop(context);
+                                            },
+                                            child: Text("Yes",
+                                              style: TextStyle(
+                                                color: mainTextColor,
+                                              ),
+                                            ),
+                                          ),
+                                        ]
+                                    );
+                                  });
+                            },
+                            icon: const Icon(
+                              Icons.delete_outline,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
                       ),
                       const Divider(
                         height: 10,
@@ -118,9 +237,11 @@ class DisplayComments extends StatelessWidget {
                   ),
                 );
               },
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }
 }
+

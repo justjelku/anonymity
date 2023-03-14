@@ -8,7 +8,7 @@ import 'dart:convert' as convert;
 
 Future<PostModel> createPost(int? postId, String message, String user, String createdAt) async {
   final response = await http.post(
-    Uri.parse("https://640d2439b07afc3b0da82c47.mockapi.io/posts"),
+    Uri.parse("https://640dc456b07afc3b0db58266.mockapi.io/posts"),
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
     },
@@ -95,7 +95,7 @@ class _CreatePostState extends State<CreatePost> {
   }
 
   getPosts() async {
-    var url = 'https://640d2439b07afc3b0da82c47.mockapi.io/posts';
+    var url = 'https://640dc456b07afc3b0db58266.mockapi.io/posts';
     var headers = {'Cache-Control': 'no-cache'};
     var response = await http.get(Uri.parse(url), headers: headers);
 

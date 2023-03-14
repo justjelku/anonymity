@@ -11,7 +11,7 @@ import 'package:permission_handler/permission_handler.dart';
 
 Future<CommentModel> addComment(int commentId, int? postId, String comment, String alias, String createdAt) async {
   final response = await http.post(
-    Uri.parse("https://640d2439b07afc3b0da82c47.mockapi.io/posts/1/comments"),
+    Uri.parse("https://640dc456b07afc3b0db58266.mockapi.io/posts/1/comments"),
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
     },
@@ -97,7 +97,7 @@ class _CommentsState extends State<Comments> {
   }
 
   getPosts() async {
-    var url = 'https://640d2439b07afc3b0da82c47.mockapi.io/posts';
+    var url = 'https://640dc456b07afc3b0db58266.mockapi.io/posts';
     var headers = {'Cache-Control': 'no-cache'};
     var response = await http.get(Uri.parse(url), headers: headers);
 
@@ -129,7 +129,7 @@ class _CommentsState extends State<Comments> {
 
 
   getComments(int data) async {
-    var url = 'https://640d2439b07afc3b0da82c47.mockapi.io/posts/1/comments';
+    var url = 'https://640dc456b07afc3b0db58266.mockapi.io/posts/1/comments';
     var headers = {'Cache-Control': 'no-cache'};
     var response = await http.get(Uri.parse(url), headers: headers);
 

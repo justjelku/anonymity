@@ -19,6 +19,7 @@ class ImageShare extends StatefulWidget {
 class _ImageShareState extends State<ImageShare> {
 
   List photos = <dynamic>[];
+  bool isLoading = true;
 
 
   @override
@@ -69,32 +70,35 @@ class _ImageShareState extends State<ImageShare> {
         backgroundColor: primaryBGColor,
         title: const Text("Photo Uploads"),
       ),
-      body: FutureBuilder<List<dynamic>>(
-          future: getPhotos(), // replace fetchPhotos with your own future function that returns the data
-          builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            } else if (snapshot.hasError) {
-              return Center(child: Text("Error: ${snapshot.error}"));
-            } else {
-              List<dynamic> photos = snapshot.data!; // access the data property of the snapshot
-              return ListView.builder(
-                  itemCount: photos.length,
-                  itemBuilder: (context, index) {
-                    return ListTile(
-                        title: ClipRRect(
-                          borderRadius: const BorderRadius.all(
-                            Radius.circular(50),
-                          ),
-                          child: Image.network(
-                            "${photos[index]['image']}",
-                          ),
-                        )
-                    );
-                  }
-              );
+      body: RefreshIndicator(
+        onRefresh: fetchTodo,
+        child: FutureBuilder<List<dynamic>>(
+            future: getPhotos(), // replace fetchPhotos with your own future function that returns the data
+            builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (snapshot.hasError) {
+                return Center(child: Text("Error: ${snapshot.error}"));
+              } else {
+                List<dynamic> photos = snapshot.data!; // access the data property of the snapshot
+                return ListView.builder(
+                    itemCount: photos.length,
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                          title: ClipRRect(
+                            borderRadius: const BorderRadius.all(
+                              Radius.circular(50),
+                            ),
+                            child: Image.network(
+                              "${photos[index]['image']}",
+                            ),
+                          )
+                      );
+                    }
+                );
+              }
             }
-          }
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
@@ -113,5 +117,23 @@ class _ImageShareState extends State<ImageShare> {
         ),
       ),
     );
+  }
+  Future<void> fetchTodo() async {
+    setState(() {
+      isLoading = true;
+    });
+    var url = 'https://640d7547b07afc3b0dadbf4d.mockapi.io/users/1/image_uploads';
+    var headers = {'Cache-Control': 'no-cache'};
+    var response = await http.get(Uri.parse(url), headers: headers);
+    if (response.statusCode == 200) {
+      final json = convert.jsonDecode(response.body) as Map;
+      final result = json['image_uploads'] as List;
+      setState(() {
+        photos = result;
+      });
+    }
+    setState(() {
+      isLoading = false;
+    });
   }
 }
