@@ -1,4 +1,5 @@
-import 'package:anonymity/constant.dart';
+import 'package:anonymity/profilepage.dart';
+import 'package:anonymity/util/constant.dart';
 import 'package:anonymity/csidebar/photouploads.dart';
 import 'package:anonymity/csidebar/settings.dart';
 import 'package:anonymity/screen/auth/login_page.dart';
@@ -9,6 +10,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
+
+import 'package:themed/themed.dart';
 
 class NavBar extends StatefulWidget {
 
@@ -36,7 +39,6 @@ class _NavBarState extends State<NavBar> {
     getUsers();
   }
 
-
   getUsers() async {
     var url = 'https://640d7547b07afc3b0dadbf4d.mockapi.io/users';
     var response = await http.get(Uri.parse(url));
@@ -50,7 +52,7 @@ class _NavBarState extends State<NavBar> {
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      backgroundColor: primaryBGColor,
+      backgroundColor: gradientStartColor,
       child: ListView(
         children: [
           UserAccountsDrawerHeader(
@@ -74,12 +76,18 @@ class _NavBarState extends State<NavBar> {
                             child: SizedBox(
                               width: 150.0,
                               height: 100.0,
-                              child: Image.network(
-                                "${widget.data[0]['avatar']}",
-                                fit: BoxFit.fill,
+                              child: ChangeColors(
+                                hue: 0,
+                                saturation: 0,
+                                brightness: 1,
+                                child: Image.asset(
+                                  "assets/logo.png",
+                                  width: 300,
+                                  height: 300,
+                                ),
                               ),
                             ),
-                          ),
+                            ),
                         ),
                       ]
                   )
@@ -131,66 +139,61 @@ class _NavBarState extends State<NavBar> {
               );
             },
           ),
-          ListTile(
-            leading: Icon(
-                Icons.settings,
-              color: mainTextColor,
-            ),
-            title: Text('Settings',
-              style: TextStyle(
-                color: mainTextColor,
-              ),
-            ),
-            onTap: () {
-              userId = int.parse(widget.data[0]['id']);
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => Settings(
-                          data: userId,
-                      )
-                  )
-              );
-            },
-          ),
           // ListTile(
           //   leading: Icon(
-          //       Icons.email,
+          //       Icons.settings,
           //     color: mainTextColor,
           //   ),
-          //   title: Text('Profile',
+          //   title: Text('Settings',
           //     style: TextStyle(
           //       color: mainTextColor,
           //     ),
           //   ),
           //   onTap: () {
+          //     userId = int.parse(widget.data[0]['userId']);
           //     Navigator.push(
           //         context,
           //         MaterialPageRoute(
-          //             builder: (context) => const Profile()
+          //             builder: (context) => Settings(
+          //                 data: userId,
+          //             )
           //         )
           //     );
           //   },
           // ),
-          const Divider(),
           ListTile(
-            title: Text('Log Out',
+            leading: Icon(
+                Icons.account_circle_rounded,
+              color: mainTextColor,
+            ),
+            title: Text('Profile',
               style: TextStyle(
                 color: mainTextColor,
               ),
-            ),
-            leading: Icon(Icons.logout_sharp,
-              color: mainTextColor,
             ),
             onTap: () {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => const LoginPage()
+                      builder: (context) => UserProfile(data: widget.data,)
                   )
               );
             },
           ),
+          const Divider(),
+          // ListTile(
+          //   title: Text(
+          //     'Log Out',
+          //     style: TextStyle(
+          //       color: mainTextColor,
+          //     ),
+          //   ),
+          //   leading: Icon(
+          //     Icons.logout_sharp,
+          //     color: mainTextColor,
+          //   ),
+          //   onTap: _logOut,
+          // ),
         ],
       ),
     );

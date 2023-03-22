@@ -1,4 +1,4 @@
-import 'package:anonymity/constant.dart';
+import 'package:anonymity/util/constant.dart';
 import 'package:flutter/material.dart';
 
 class LikeButton extends StatefulWidget {

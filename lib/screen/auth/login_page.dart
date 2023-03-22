@@ -1,4 +1,4 @@
-import 'package:anonymity/constant.dart';
+import 'package:anonymity/util/constant.dart';
 import 'package:flutter/material.dart';
 import 'package:anonymity/util/data_model.dart';
 import 'package:anonymity/util/database.dart';
@@ -10,14 +10,14 @@ import 'package:permission_handler/permission_handler.dart';
 import 'dart:convert' as convert;
 import 'package:themed/themed.dart';
 
-Future<DataModel> postAccount(int? id, String firstname, String lastname, String username, String password, String email) async {
+Future<DataModel> userModel(int? userId, String firstname, String lastname, String username, String password, String email) async {
   final response = await http.post(
     Uri.parse("https://640d7547b07afc3b0dadbf4d.mockapi.io/users"),
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
     },
     body: jsonEncode(<dynamic, dynamic>{
-      'id': id,
+      'userId': userId,
       'firstname': firstname,
       'lastname': lastname,
       'username': username,
@@ -29,7 +29,7 @@ Future<DataModel> postAccount(int? id, String firstname, String lastname, String
   if (response.statusCode == 201) {
     return DataModel.fromJson(jsonDecode(response.body));
   } else {
-    throw Exception('Failed to Add Todo');
+    throw Exception('Failed to Add User');
   }
 }
 class LoginPage extends StatefulWidget {
@@ -109,7 +109,7 @@ class _LoginPageState extends State<LoginPage> {
 
   _showMsg(msg) {
     final snackBar = SnackBar(
-      backgroundColor: primaryBGColor,
+      backgroundColor: gradientStartColor,
         content: Text(msg),
         action: SnackBarAction(
           label: 'Close',
@@ -153,7 +153,7 @@ class _LoginPageState extends State<LoginPage> {
                           width: 300,
                           height: 300)
                   ),
-                  const Text("ANONYMITY 2.0",
+                  const Text("ANONYMITY 2.1",
                       style: TextStyle(
                           fontSize: 20,
                           color: Colors.white,
@@ -349,7 +349,7 @@ class _LoginPageState extends State<LoginPage> {
                     );
                     db.insertData(dataLocal);
                     setState(() {
-                      postAccount(
+                      userModel(
                           currentIndex,
                           firstNameController.text,
                           lastNameController.text,

@@ -1,6 +1,7 @@
+import 'dart:async';
 import 'dart:convert';
-import 'package:anonymity/constant.dart';
-import 'package:anonymity/likebutton.dart';
+import 'package:anonymity/util/constant.dart';
+import 'package:anonymity/util/likebutton.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'dart:convert' as convert;
@@ -16,8 +17,9 @@ class DisplayComments extends StatefulWidget {
 }
 
 class _DisplayCommentsState extends State<DisplayComments> {
-
+  bool isLoading = true;
   List comments = <dynamic>[];
+  bool showNoCommentsText = false;
   @override
   void initState() {
     fetchTodo();
@@ -57,21 +59,6 @@ class _DisplayCommentsState extends State<DisplayComments> {
     }
   }
 
-  _showMsg(msg) {
-    final snackBar = SnackBar(
-        backgroundColor: primaryBGColor,
-        content: Text(msg),
-        action: SnackBarAction(
-          label: 'Close',
-          textColor: mainTextColor,
-          onPressed: () {},
-        )
-    );
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-  }
-
-  bool isLoading = true;
-
   Future<void> fetchTodo() async {
     setState(() {
       isLoading = true;
@@ -91,12 +78,25 @@ class _DisplayCommentsState extends State<DisplayComments> {
     });
   }
 
+  _showMsg(msg) {
+    final snackBar = SnackBar(
+        backgroundColor: gradientStartColor,
+        content: Text(msg),
+        action: SnackBarAction(
+          label: 'Close',
+          textColor: mainTextColor,
+          onPressed: () {},
+        )
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: gradientEndColor,
       appBar: AppBar(
-        backgroundColor: primaryBGColor,
+        backgroundColor: gradientStartColor,
         title: const Text("Comments"),
       ),
       body: RefreshIndicator(
@@ -107,16 +107,40 @@ class _DisplayCommentsState extends State<DisplayComments> {
             if (snapshot.hasError) {
               return Center(child: Text('Error: ${snapshot.error}'));
             }
-            if (!snapshot.hasData || snapshot.data == null || snapshot.data!.isEmpty) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
               return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
-                      CircularProgressIndicator(),
-                      SizedBox(height: 16.0),
-                      Text('Loading...'),
-                    ],
-                  ));
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: const [
+                    CircularProgressIndicator(),
+                    SizedBox(height: 16.0),
+                    Text('Loading'),
+                  ],
+                ),
+              );
+            }
+            Timer(const Duration(seconds: 10), () {
+              if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                setState(() {
+                  showNoCommentsText = true;
+                });
+              }
+            });
+            if (showNoCommentsText) {
+              return const Center(child: Text('No comments yet'));
+            }
+            if (snapshot.data == null || snapshot.data!.isEmpty) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: const [
+                    ListTile(
+                      title: Text('No comments yet'),
+                      subtitle: Text('Be the first to comment.'),
+                    ),
+                  ],
+                ),
+              );
             }
             List<dynamic> postComment = snapshot.data!;
             return ListView.builder(
@@ -124,17 +148,6 @@ class _DisplayCommentsState extends State<DisplayComments> {
               itemBuilder: (context, index) {
                 return Container(
                   padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.5),
-                        spreadRadius: 2,
-                        blurRadius: 5,
-                        offset: const Offset(0, 3),
-                      ),
-                    ],
-                  ),
                   child: Column(
                     children: <Widget>[
                       ListTile(
@@ -230,9 +243,6 @@ class _DisplayCommentsState extends State<DisplayComments> {
                         indent: 5,
                         endIndent: 5,
                       ),
-                      const SizedBox(
-                        height: 10,
-                      )
                     ],
                   ),
                 );

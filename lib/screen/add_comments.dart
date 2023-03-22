@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'package:anonymity/constant.dart';
+import 'package:anonymity/util/constant.dart';
 import 'package:anonymity/screen/display_comments.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -63,18 +63,18 @@ class CommentModel {
   }
 }
 
-class Comments extends StatefulWidget {
+class AddComments extends StatefulWidget {
 
   final int data;
-  const Comments({
+  const AddComments({
     required this.data,
     Key? key}) : super(key: key);
 
   @override
-  State<Comments> createState() => _CommentsState();
+  State<AddComments> createState() => _AddCommentsState();
 }
 
-class _CommentsState extends State<Comments> {
+class _AddCommentsState extends State<AddComments> {
   final TextEditingController commentController = TextEditingController();
   final TextEditingController aliasController = TextEditingController();
 
@@ -92,7 +92,8 @@ class _CommentsState extends State<Comments> {
 
   @override
   void initState() {
-    getPosts();
+    // getPosts();
+    getComments(widget.data);
     super.initState();
   }
 
@@ -115,7 +116,7 @@ class _CommentsState extends State<Comments> {
 
   _showMsg(msg) {
     final snackBar = SnackBar(
-        backgroundColor: primaryBGColor,
+        backgroundColor: gradientStartColor,
         content: Text(msg),
         action: SnackBarAction(
           label: 'Close',
@@ -128,19 +129,42 @@ class _CommentsState extends State<Comments> {
 
 
 
-  getComments(int data) async {
-    var url = 'https://640dc456b07afc3b0db58266.mockapi.io/posts/1/comments';
+  getComments(int postId) async {
+    var url = 'https://640dc456b07afc3b0db58266.mockapi.io/posts/$postId/comments'; // Construct URL with postId
     var headers = {'Cache-Control': 'no-cache'};
     var response = await http.get(Uri.parse(url), headers: headers);
 
-    setState( () {
+    setState(() {
       comments = convert.jsonDecode(response.body) as List<dynamic>;
       for(int i = 0; i < comments.length; i++){
-        if(data == comments[comments.length]['postId']){
+        if(postId == comments[comments.length]['postId']){
           postComments.add(comments[i]);
         }
       }
     });
+  }
+
+
+  Future<void> _submitComment() async {
+    final comment = commentController.text;
+    final alias = aliasController.text;
+    final createdAt = formattedDate;
+    try {
+      final commentModel = await addComment(
+        comments.length + 1,
+        widget.data, // Pass the postId to addComment
+        comment,
+        alias,
+        createdAt,
+      );
+      setState(() {
+        postComments.add(commentModel);
+      });
+      commentController.clear();
+      aliasController.clear();
+    } catch (e) {
+      _showMsg('Failed to add comment: $e');
+    }
   }
 
 
@@ -149,7 +173,7 @@ class _CommentsState extends State<Comments> {
     return Scaffold(
         backgroundColor: gradientEndColor,
       appBar: AppBar(
-        backgroundColor: primaryBGColor,
+        backgroundColor: gradientStartColor,
         title: const Text("Add Comment"),
       ),
       body: Form(
@@ -261,24 +285,7 @@ class _CommentsState extends State<Comments> {
                     ElevatedButton(
                         onPressed: (){
                           Navigator.pop(context);
-                          String commentText = commentController.text.trim();
-                          String aliasText = aliasController.text.trim();
-                          if (commentText.isNotEmpty && aliasText.isNotEmpty) {
-                            setState(() {
-                              addComment(
-                                  comments.lastIndexOf('commentId', 0),
-                                  widget.data,
-                                  commentText,
-                                  aliasText,
-                                  formattedDate
-                              );
-                            });
-                            commentController.clear();
-                            aliasController.clear();
-                          } else {
-                            // Show an error message or toast to the user indicating that the fields cannot be empty
-                            _showMsg("Comment and alias fields cannot be empty");
-                          }
+                          _submitComment();
                         },
                         style: ButtonStyle(
                           padding: MaterialStateProperty.all<EdgeInsets>(
@@ -306,7 +313,7 @@ class _CommentsState extends State<Comments> {
                       },
                       child: Text("See All Comments",
                       style: TextStyle(
-                        color: primaryBGColor,
+                        color: gradientStartColor,
                       ),),
                     ),
                   ],

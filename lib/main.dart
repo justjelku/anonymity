@@ -1,4 +1,4 @@
-import 'package:anonymity/constant.dart';
+import 'package:anonymity/util/constant.dart';
 import 'package:flutter/material.dart';
 import 'screen/auth/login_page.dart';
 
@@ -8,7 +8,7 @@ void main() {
     debugShowCheckedModeBanner: false,
     title: 'Anonymity',
     theme: ThemeData(
-      backgroundColor: primaryBGColor,
+      backgroundColor: gradientStartColor,
     ),
     home: const LoginPage(),
   )

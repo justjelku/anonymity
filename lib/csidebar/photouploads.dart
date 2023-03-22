@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'package:anonymity/constant.dart';
+import 'package:anonymity/util/constant.dart';
 import 'package:path/path.dart';
 import 'package:async/async.dart';
 import 'package:http/http.dart' as http;
@@ -67,7 +67,7 @@ class _ImageShareState extends State<ImageShare> {
     return Scaffold(
       backgroundColor: gradientEndColor,
       appBar: AppBar(
-        backgroundColor: primaryBGColor,
+        backgroundColor: gradientStartColor,
         title: const Text("Photo Uploads"),
       ),
       body: RefreshIndicator(
