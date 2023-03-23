@@ -1,4 +1,5 @@
 import 'package:anonymity/util/constant.dart';
+import 'package:anonymity/util/splashscreen.dart';
 import 'package:flutter/material.dart';
 import 'screen/auth/login_page.dart';
 
@@ -10,7 +11,7 @@ void main() {
     theme: ThemeData(
       backgroundColor: gradientStartColor,
     ),
-    home: const LoginPage(),
+    home: const SplashScreen(),
   )
   );
 }

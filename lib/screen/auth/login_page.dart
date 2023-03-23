@@ -10,7 +10,29 @@ import 'package:permission_handler/permission_handler.dart';
 import 'dart:convert' as convert;
 import 'package:themed/themed.dart';
 
+Future<bool> checkUserExists(String username) async {
+  var url = 'https://640d7547b07afc3b0dadbf4d.mockapi.io/users';
+  var response = await http.get(Uri.parse(url));
+
+  if (response.statusCode == 200) {
+    List<dynamic> accounts = convert.jsonDecode(response.body) as List<dynamic>;
+    for (var i = 0; i < accounts.length; i++) {
+      if (username == accounts[i]['username']) {
+        return true;
+      }
+    }
+    return false;
+  } else {
+    throw Exception('Failed to retrieve users');
+  }
+}
+
 Future<DataModel> userModel(int? userId, String firstname, String lastname, String username, String password, String email) async {
+  bool exists = await checkUserExists(username);
+  if (exists) {
+    throw Exception('User already exists');
+  }
+
   final response = await http.post(
     Uri.parse("https://640d7547b07afc3b0dadbf4d.mockapi.io/users"),
     headers: <String, String>{
@@ -32,6 +54,8 @@ Future<DataModel> userModel(int? userId, String firstname, String lastname, Stri
     throw Exception('Failed to Add User');
   }
 }
+
+
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
 
